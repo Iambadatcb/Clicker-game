@@ -12,8 +12,9 @@ public class Clicker : MonoBehaviour
     public float duration = 0.1f;
     public Ease ease = Ease.OutElastic;
 
-    private int clicks = 0;
+    [Header("Audio")]
     public AudioClip clip;
+    [HideInInspector]public int clicks = 0;
 
     private AudioSource audioSource;
     
@@ -27,12 +28,14 @@ public class Clicker : MonoBehaviour
         // Debug.Log("Clicks: " + clicks);
         UIManager.instance.UpdateClicks(clicks);
 
+        audioSource.pitch = Random.Range(0.9f, 1.1f);
+        audioSource.PlayOneShot(clip);
+
         transform
         .DOScale(1, duration)
         .ChangeStartValue(scale * Vector3.one)
         .SetEase(ease);
         // .SetLoops(2,LoopType.Yoyo);
-        audioSource.PlayOneShot(clip);
     }
 
     
