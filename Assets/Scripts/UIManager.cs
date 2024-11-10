@@ -9,6 +9,7 @@ public class UIManager : MonoBehaviour
 
     public static UIManager instance;
     public TextMeshProUGUI clickText;
+    public TextMeshProUGUI cpsText;
 
     private void Awake()
     {
@@ -24,5 +25,9 @@ public class UIManager : MonoBehaviour
     public void UpdateClicks(int clicks)
     {
         clickText.text = clicks.ToString();
+    }
+    public void UpdateCps(int cps)
+    {
+        cpsText.text = cps.ToString();
     }
 }

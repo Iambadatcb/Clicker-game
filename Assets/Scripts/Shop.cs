@@ -19,11 +19,17 @@ public class Shop : MonoBehaviour
     [Header("Upgrade")]
 
     public int upgrade=0;
+    public TextMeshProUGUI upgrCostText;
+    public int upgrCost = 1000;
 
 
     private Clicker clicker;
 
     private void Start(){
+        upgrade = PlayerPrefs.GetInt("upgrades", 0);
+        count = PlayerPrefs.GetInt("rebirths", 0);
+        price = PlayerPrefs.GetInt("rebPrice", 0);
+        countText.text = count.ToString();
         clicker=FindObjectOfType<Clicker>();
         InvokeRepeating("Cook",0,bakerSpeed);
     }
@@ -50,8 +56,8 @@ public class Shop : MonoBehaviour
         clicker.clickVFX.Emit(cpb * count);
         clicker.clicks+=cpb*count;
         UIManager.instance.UpdateClicks(clicker.clicks);
-        PlayerPrefs.SetInt("Rebirths",count);
-        PlayerPrefs.Save();
+        // PlayerPrefs.SetInt("Rebirths",count);
+        // PlayerPrefs.Save();
          
     }
     public void Upgrade()
@@ -62,7 +68,26 @@ public class Shop : MonoBehaviour
             count = 0;
             clicker.clicks=0;
             UIManager.instance.UpdateClicks(clicker.clicks);
+            upgrCost= (int)(upgrCost*1.1f);
+            upgrCostText.text = $"Cost: {upgrCost}";
         }
+    }
+    private void OnApplicationPause(bool pauseStatus)
+    {
+        if(pauseStatus){
+            Save();
+        }
+    }
+    private void OnApplicationQuit()
+    {
+        Save();
+    }
+    public void Save()
+    {
+        PlayerPrefs.SetInt("rebirths", count);
+        PlayerPrefs.SetInt("upgrades", upgrade);
+        PlayerPrefs.SetInt("rebPrice", price);
+        PlayerPrefs.Save();
     }
     // private void Update()
     // {

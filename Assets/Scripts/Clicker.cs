@@ -18,16 +18,32 @@ public class Clicker : MonoBehaviour
 
     [Header("VFX")]
     public ParticleSystem clickVFX;
+    // public ParticleSystemRenderer effects;
+    public Mesh mesh;
     [HideInInspector]public int clicks = 0;
 
     private AudioSource audioSource;
 
+    private  int oldClicks =0;
+
      private Shop bakers;
+     private int changesClick = 0;
+     
     
     void Start()
     {
+        
+        clicks = PlayerPrefs.GetInt("clicks", 0);
+        // bakers.upgrade = PlayerPrefs.GetInt("upgrades", 0);
+        // bakers.count = PlayerPrefs.GetInt("rebirths", 0);
         audioSource = GetComponent<AudioSource>();
+        InvokeRepeating("CountClicks", 1,1);
         bakers = FindObjectOfType<Shop>();
+    }
+    void Update()
+    {
+        Changes();
+
     }
     // void Update()
     // {
@@ -42,9 +58,9 @@ public class Clicker : MonoBehaviour
     private void OnMouseDown()
     {
         clickVFX.Emit(1);
-        if(bakers.upgrade ==1)
+        if(bakers.upgrade >=1)
         {
-            clicks+=2;
+            clicks+= 2 * bakers.upgrade;
         }
         else if(bakers.upgrade<1)
         {
@@ -61,13 +77,52 @@ public class Clicker : MonoBehaviour
         .DOScale(1, duration)
         .ChangeStartValue(scale * Vector3.one)
         .SetEase(ease);
+        changesClick++;
+        // PlayerPrefs.SetInt("Clicks", clicks);
         
-        PlayerPrefs.SetInt("Clicks", clicks);
-        
-        PlayerPrefs.Save();
+        // PlayerPrefs.Save();
         // .SetLoops(2,LoopType.Yoyo);
     }
     
+    private void CountClicks(){
+        var cps = clicks-oldClicks;
+        oldClicks = clicks;
+
+        UIManager.instance.UpdateCps(cps);
+    }
+    private void OnApplicationPause(bool pauseStatus)
+    {
+        if(pauseStatus){
+            Save();
+        }
+    }
+    private void OnApplicationQuit()
+    {
+        Save();
+    }
+    public void Save(){
+        PlayerPrefs.SetInt("clicks", clicks);
+        // PlayerPrefs.SetInt("rebirths", bakers.count);
+        // PlayerPrefs.SetInt("upgrades", bakers.upgrade);
+        PlayerPrefs.Save();
+    }
+    private void Changes()
+    {
+        if (changesClick ==100)
+        {
+            changesClick = 0;
+            var main = clickVFX.main;
+            var shape = clickVFX.shape;
+            // effects = GetComponent<ParticleSystemRenderer>();
+
+            main.startDelay = 1.0f;
+            shape.enabled= true;
+            shape.shapeType = ParticleSystemShapeType.Mesh;
+            shape.mesh = mesh;
+            // effects.mesh = Resources.GetBuiltinResource<Mesh>("Sphere.fbx");
+        }
+
+    }
 
     
 }
